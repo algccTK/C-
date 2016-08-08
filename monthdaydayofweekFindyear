@@ -1,0 +1,44 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+
+namespace pickkeyinformation
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("輸入月");
+            int month = int.Parse(Console.ReadLine());
+            Console.WriteLine("輸入日");
+            int day = int.Parse(Console.ReadLine());
+            Console.WriteLine("輸入星期，0-6。星期日為0");
+            int dayofweek = int.Parse(Console.ReadLine());
+            Console.WriteLine("輸入起始年(含)");
+            int startyear = int.Parse(Console.ReadLine());
+            Console.WriteLine("輸入結束年(含)");
+            int endyear = int.Parse(Console.ReadLine());
+            Console.WriteLine("\n符合年份如下：\n");
+            string date;
+            for (int i = startyear; i <= endyear; i++)
+            {
+                date = string.Format("{0}-{1}-{2}", i, month, day);
+                DateTime judge = DateTime.Parse(date);
+                if ((int)judge.DayOfWeek == dayofweek) Console.WriteLine(i);
+                
+            }
+            Console.ReadLine();
+            
+
+            
+        }
+        
+    }
+    
+
+
+    
+    
+}
