@@ -1,0 +1,12 @@
+.py改成.pyw
+import datetime, calendar  
+import time
+def IsSunday():
+    dayofweek = datetime.today().weekday() #获取的为当前系统时间,返回的是0-6是星期一到星期日
+    if dayofweek==0 :return true
+    else :return false
+
+def alreadydo():#已執行過
+    1
+time.sleep( 3600 )#參數是秒
+if IsSunday() and not alreadydo():
