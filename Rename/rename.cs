@@ -15,15 +15,15 @@ namespace _004_WPF_Practice2
             
             foreach (string item in asslist)
             {
-                string re = "^.*[^0-9A-Za-z]\\(d{2})[^0-9A-Za-z].*\\.(\\w)$";
+                string re = "^.*[^0-9A-Za-z](\\d{2})[^0-9A-Za-z].*\\.(\\w*)$";
                 var aa = Regex.Match(item, re);
                 string willRename="";
-                string re2 = string.Format("(^.*[^0-9A-Za-z]{0}[^0-9A-Za-z].*\\).\\w$", aa.Groups[1].ToString());
+                string re2 = string.Format("(^.*[^0-9A-Za-z]{0}[^0-9A-Za-z].*)\\.\\w*$", aa.Groups[1].ToString());
                 foreach (var mkvitem in mkvlist)
                 {
                     if (Regex.IsMatch(mkvitem, re2))
                     {
-                        var aa2 = Regex.Match(item, re2);
+                        var aa2 = Regex.Match(mkvitem, re2);
                         willRename = aa2.Groups[1].ToString() + "." + aa.Groups[2].ToString();
                         break;
                     }
