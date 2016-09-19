@@ -1,0 +1,3 @@
+https://technet.microsoft.com/zh-cn/library/cc716882(VS.90).aspx
+
+如果 TreeView 包含很多项，则加载所用的时间可能导致用户界面的明显延迟。可以通过将 VirtualizingStackPanel.IsVirtualizing 附加属性设置为 true 来缩短加载时间。当用户通过使用鼠标滚轮或拖动滚动条上的滚动块来滚动 TreeView 时，用户界面可能也会反应迟缓。可以通过将 VirtualizingStackPanelVirtualizationMode() 附加属性设置为 Recycling，提高 TreeView 在用户滚动时的性能。
