@@ -10,6 +10,7 @@ namespace test_ConsoleApplication
 {
     class DeleteVoiceFiles
     {
+        private int count = 0;
         public static void Strat()
         {
             Console.WriteLine("輸入‘y’確認刪除音頻文件");
@@ -17,6 +18,8 @@ namespace test_ConsoleApplication
             if (Input == "y")
             {
                 Delete(GetPath());
+                Console.WriteLine("删除完成，共删除"+ count.ToString() +"个文件");
+                Console.ReadLine();
 
             }
         }
@@ -41,7 +44,11 @@ namespace test_ConsoleApplication
             {
                 if (item.Extension == ".ogg" || item.Extension == ".wav" )
                 {
+                    Console.WriteLine("准备删除:"+item.FullName);
                     File.Delete(item.FullName);
+                    count++;
+                    Console.WriteLine("删除 "+item.FullName + "完成");
+                    
                 }
             }
 
