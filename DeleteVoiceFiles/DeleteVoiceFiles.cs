@@ -10,7 +10,7 @@ namespace test_ConsoleApplication
 {
     class DeleteVoiceFiles
     {
-        private int count = 0;
+        private static int count = 0;
         public static void Strat()
         {
             Console.WriteLine("輸入‘y’確認刪除音頻文件");
@@ -18,7 +18,7 @@ namespace test_ConsoleApplication
             if (Input == "y")
             {
                 Delete(GetPath());
-                Console.WriteLine("删除完成，共删除"+ count.ToString() +"个文件");
+                Console.WriteLine("操作完成，共删除"+ count.ToString() +"个文件");
                 Console.ReadLine();
 
             }
