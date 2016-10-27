@@ -10,3 +10,5 @@ def alreadydo():#已執行過
     1
 time.sleep( 3600 )#參數是秒
 if IsSunday() and not alreadydo():
+
+https://github.com/sst311212/MngMerge
