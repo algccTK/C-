@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using System.IO;
+
+using System.Threading;
+
+namespace test_ConsoleApplication
+{
+    class Story
+    {
+        public static void Main(string[] args)
+        {
+            string path = @"";
+            FileStream fs = new FileStream(path,FileMode.Open);
+            BinaryReader br = new BinaryReader(fs);
+            
+            try
+            {
+                int a = 0;
+                while (a<10)
+                {
+                    int num = (Int32)br.ReadByte();
+                    string num16 = string.Format("{0:x}", num);
+                    Console.Write(num16);
+                    a++;
+                }
+            }
+            catch (Exception)
+            {
+
+                
+            }
+            
+            
+            //Console.WriteLine(show);
+            Console.ReadLine();
+            
+        }
+    }
+}
