@@ -11,3 +11,5 @@ def alreadydo():#已執行過
 time.sleep( 3600 )#參數是秒
 if IsSunday() and not alreadydo():
 
+CrackMe 160
+http://www.52pojie.cn/forum.php?mod=viewthread&tid=264605
