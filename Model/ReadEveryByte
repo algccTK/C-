@@ -1,0 +1,13 @@
+//http://bbs.csdn.net/topics/190093148
+System.IO.FileStream readFs =new System.IO.FileStream(@"c:\1.jpg",System.IO.FileMode.Open);
+readFs.Position=100;
+byte[] Data =new byte[100];
+
+readFs.Read(Data,0,100);
+
+readFs.Close();
+
+System.IO.FileStream writeFs =new System.IO.FileStream(@"c:\1.jpg",System.IO.FileMode.Open);
+writeFs.Position=200;
+writeFs.Write(Data,0,100);
+writeFs.Close();
