@@ -1,0 +1,399 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using System.Collections;
+
+namespace c013_Huffuman
+{
+    class Encode
+    {
+        public static void DoEncode(string inputPath, string outputPath)
+        {
+            long size = 0;
+            var a = GetBinFrequencyTable(inputPath, out size);
+            HuffumanTree theTree = TreeHelp.EncodeBuildTree(a);//建樹完成
+            theTree.HuffumanCode = "";
+            theTree.Depth = 0;
+            Hashtable mappingtable = new Hashtable();//key 是int類型的字節名，value是string類型的哈夫曼碼
+            int maxDepth = 0;
+            GreatMappingTable(theTree, mappingtable, ref maxDepth);//取得映射表與最大深度
+
+            //構建頭
+            string headstr = Toolc.HexadecimalConversion.DecToBinString(size);
+            headstr = Toolc.HexadecimalConversion.SupplementZero(40, headstr);//源文件大小
+
+            if (headstr.Length % 8 != 0) return;//不是完整字節，有錯
+
+            string leafCount = Toolc.HexadecimalConversion.DecToBinString(mappingtable.Count - 1);//葉子數量-1
+            leafCount = Toolc.HexadecimalConversion.SupplementZero(8, leafCount);//葉子數量-1的binstr
+            headstr += leafCount;
+
+            if (headstr.Length % 8 != 0) return;//不是完整字節，有錯
+
+            string mappingBinStr = "";
+            foreach (var item in mappingtable.Keys)//加映射表
+            {
+                int lenght = (mappingtable[item] as string).Length;
+                string lengthBinStr = Toolc.HexadecimalConversion.DecToBinString(lenght);
+                lengthBinStr = Toolc.HexadecimalConversion.SupplementZero(8, lengthBinStr);
+
+                int byteCountForMappingCode = 0;
+                if (lenght % 8 == 0)
+                {
+                    byteCountForMappingCode = lenght;
+                }
+                else
+                {
+                    byteCountForMappingCode = (lenght / 8 + 1) * 8;
+
+                }
+                string mappingCodeBinStr = Toolc.HexadecimalConversion.SupplementZero(byteCountForMappingCode, (mappingtable[item] as string));
+
+                int byteNameInt = int.Parse(item.ToString());
+                string byteNameStr = Toolc.HexadecimalConversion.DecToBinString(byteNameInt);
+                byteNameStr = Toolc.HexadecimalConversion.SupplementZero(8, byteNameStr);
+
+                mappingBinStr += (lengthBinStr + mappingCodeBinStr + byteNameStr);
+            }
+            headstr += mappingBinStr;
+
+            //把頭轉換成字節寫入
+            if (headstr.Length % 8 != 0) return;//不是完整字節，有錯
+
+            System.IO.FileStream writeFs = new System.IO.FileStream(outputPath, System.IO.FileMode.OpenOrCreate);
+            long writeByteCount = 0;
+            for (int i = 0; i < headstr.Length / 8; i++)
+            {
+                string byteStr = headstr.Substring(i * 8, 8);
+                writeFs.WriteByte(Toolc.HexadecimalConversion.ByteStrToByte(byteStr));
+                writeFs.Flush();
+                writeByteCount++;
+            }//至此，寫完頭
+
+            System.IO.FileStream readFs = new System.IO.FileStream(inputPath, System.IO.FileMode.OpenOrCreate);
+            int readbyte = 0;
+            string byteTemp = "";
+            while (true)
+            {
+                readbyte = readFs.ReadByte();
+                if (readbyte == -1)
+                {
+                    int needSupplementZeroNumber = 8- byteTemp.Length;     //需要補多少個0
+                    for (int i = 0; i < needSupplementZeroNumber; i++)//處理尾端,不足補0
+                    {
+                        byteTemp += "0";
+                    }
+                    writeFs.WriteByte(Toolc.HexadecimalConversion.ByteStrToByte(byteTemp.Substring(0, 8)));
+                    writeFs.Flush();
+                    writeByteCount++;
+
+                    readFs.Close();
+                    writeFs.Close();
+                    break;
+                }
+                byteTemp += mappingtable[readbyte];
+                while (byteTemp.Length > 8)//位數大於8就寫入， //使讀取前byteTemp的長度小於8
+                {
+                    writeFs.WriteByte(Toolc.HexadecimalConversion.ByteStrToByte(byteTemp.Substring(0, 8)));
+                    writeFs.Flush();
+                    writeByteCount++;
+                    byteTemp = byteTemp.Substring(8);
+                }
+            }
+
+
+
+
+        }
+
+        private static Hashtable GetBinFrequencyTable(string inputpath, out long Size)//計算輸入文件的字節頻率,順便取得文件字節數
+        {
+            Hashtable willre = new Hashtable();
+            System.IO.FileStream readFs = new System.IO.FileStream(inputpath, System.IO.FileMode.Open);
+            Size = readFs.Length;
+
+            int readbyte = 0;
+
+            while (true)
+            {
+                readbyte = readFs.ReadByte();
+                if (readbyte == -1)
+                {
+                    break;
+                }
+                if (willre.ContainsKey(readbyte))
+                {
+                    willre[readbyte] = (int)willre[readbyte] + 1;
+                }
+                else
+                {
+                    willre.Add(readbyte, 1);
+                }
+            }
+            readFs.Close();
+            return willre;
+
+        }
+
+        private static void GreatMappingTable(HuffumanTree tree, Hashtable mappingtable, ref int maxdepth, int dadDepth = 0, string dadHuffumanCode = "", string willAddHuffumanCode = "")//遞歸生成映射表
+        {
+            if (tree.Depth == 0)//第一個
+            {
+                GreatMappingTable((tree.Left as HuffumanTree), mappingtable, ref maxdepth, 0, "", "0");
+                GreatMappingTable((tree.Right as HuffumanTree), mappingtable, ref maxdepth, 0, "", "1");
+                return;
+            }
+
+            tree.Depth = dadDepth + 1;
+            tree.HuffumanCode = dadHuffumanCode + willAddHuffumanCode;
+
+
+
+            if (tree.Value != -1)
+            {
+                mappingtable.Add(tree.Value, tree.HuffumanCode);
+                if (tree.Depth > maxdepth)
+                {
+                    maxdepth = tree.Depth;
+                }
+                return;
+            }
+
+            GreatMappingTable((tree.Left as HuffumanTree), mappingtable, ref maxdepth, tree.Depth, tree.HuffumanCode, "0");
+            GreatMappingTable((tree.Right as HuffumanTree), mappingtable, ref maxdepth, tree.Depth, tree.HuffumanCode, "1");
+
+
+
+
+        }
+    }
+
+    class Decode
+    {
+        public static void DoDecode(string inputPath, string outputPath)
+        {
+            System.IO.FileStream readFs = new System.IO.FileStream(inputPath, System.IO.FileMode.Open);
+            string fileSizeStr = "";
+            for (int i = 0; i < 5; i++)
+            {
+                var fileSizeStrTemp1 = Toolc.HexadecimalConversion.DecToBinString(readFs.ReadByte());
+                fileSizeStrTemp1 = Toolc.HexadecimalConversion.SupplementZero(8, fileSizeStrTemp1);
+                fileSizeStr += fileSizeStrTemp1;
+            }
+            long fileSizeLong = Toolc.HexadecimalConversion.ByteStrToLong(fileSizeStr);//解析完壓縮前字節數
+            int leafCount = readFs.ReadByte();//解析樹的葉子數量
+            Hashtable mappingTable = new Hashtable();//字節和碼的對應表，Key是string的碼，value是int的字節名
+            for (int i = 0; i < leafCount + 1; i++)//此循環解析得到映射表
+            {
+                int bitCount = readFs.ReadByte();
+                int willReadByteCount = 0;
+                if (bitCount % 8 == 0)
+                {
+                    willReadByteCount = bitCount / 8;
+                }
+                else willReadByteCount = (bitCount / 8 + 1);
+                string huffumanCode = "";
+                for (int j = 0; j < willReadByteCount; j++)
+                {
+                    var x = Toolc.HexadecimalConversion.DecToBinString(readFs.ReadByte());
+                    x = Toolc.HexadecimalConversion.SupplementZero(8, x);
+                    huffumanCode += x;
+                }
+                huffumanCode = huffumanCode.Substring(huffumanCode.Length - bitCount);
+
+                int byteInt = readFs.ReadByte();
+
+                mappingTable.Add(huffumanCode, byteInt);
+            }
+
+            System.IO.FileStream writeFs = new System.IO.FileStream(outputPath, System.IO.FileMode.OpenOrCreate);
+            long writeByteCount = 0;
+            string recoveryTemp = "";
+            while (true)     //解析真實數據
+            {
+                if (writeByteCount == fileSizeLong)
+                {
+                    writeFs.Close();
+                    readFs.Close();
+                    break;
+                }
+
+
+                PraseStringWithHuffmanCode(ref recoveryTemp, mappingTable, writeFs, ref writeByteCount);
+                var readByteInt = readFs.ReadByte();
+                //if (readByteInt == -1)
+                //{
+                //    throw new Exception();
+                //}
+                var readNot8 = Toolc.HexadecimalConversion.DecToBinString(readByteInt);
+                var readIs8 = Toolc.HexadecimalConversion.SupplementZero(8, readNot8);
+                recoveryTemp += readIs8;
+            }
+
+
+        }
+
+        public static void PraseStringWithHuffmanCode(ref string recoveryTemp, Hashtable mappingTable, System.IO.FileStream writeFs, ref long writeByteCount)//遞歸解析字符串
+        {
+            ////調試用
+            //if (writeByteCount > 4089850)
+            //{
+
+            //}
+            ////   調試用END
+
+            int recoveryTempLength = recoveryTemp.Length;
+            for (int i = 1; i < recoveryTempLength+1; i++)
+            {
+                if (mappingTable[recoveryTemp.Substring(0, i)] != null)
+                {
+                    byte willWrite = Toolc.HexadecimalConversion.IntToByte((int)(mappingTable[recoveryTemp.Substring(0, i)]));
+
+                    writeFs.WriteByte(willWrite);
+                    writeFs.Flush();
+                    recoveryTemp = recoveryTemp.Substring(i);
+                    writeByteCount++;
+                    PraseStringWithHuffmanCode(ref recoveryTemp, mappingTable, writeFs, ref writeByteCount);
+                    break;
+
+                }
+            }
+        }
+
+    }
+
+    class TreeHelp
+    {
+        public static HuffumanTree EncodeBuildTree(Hashtable sou)//編碼建樹 ，sou為的頻率表
+        {
+            List<object> theset = SortTheCollection(sou);//這個列表將會有兩種類型，樹和ByteFrequency
+            while (theset.Count > 1)
+            {
+                var son1 = theset[0];
+                var son2 = theset[1];
+                theset.Add(BuildTree(son1, son2));
+                theset.Remove(son1);
+                theset.Remove(son2);
+                theset.Sort(SortCompare);//重新排列
+            }
+            return theset[0] as HuffumanTree;
+
+        }
+
+        private static HuffumanTree BuildTree(object left, object right) //輸入兩個子節點建樹
+        {
+            long pl = 0, pr = 0;
+            HuffumanTree willre = new HuffumanTree();
+            if (left is HuffumanTree)
+            {
+                willre.Left = left;
+                pl = (left as HuffumanTree).Point;
+            }
+            else if (left is ByteFrequency)
+            {
+                ByteFrequency leftb = left as ByteFrequency;
+                willre.Left = new HuffumanTree() { Value = leftb.ByteName, Point = leftb.ByteCount, Depth = -2 };
+                pl = leftb.ByteCount;
+            }
+
+            if (right is HuffumanTree)
+            {
+                willre.Right = right;
+                pr = (right as HuffumanTree).Point;
+            }
+            else if (right is ByteFrequency)
+            {
+                ByteFrequency rightb = right as ByteFrequency;
+                willre.Right = new HuffumanTree() { Value = rightb.ByteName, Point = rightb.ByteCount, Depth = -2 };
+                pr = rightb.ByteCount;
+            }
+
+            willre.Point = pl + pr;
+            willre.Value = -1;
+            willre.Depth = -1;
+            return willre;
+
+        }
+
+        private static List<object> SortTheCollection(Hashtable sout)//返回權值從小到大排列的列表
+        {
+            List<object> willre = new List<object>();
+            foreach (var item in sout.Keys)
+            {
+                willre.Add(new ByteFrequency() { ByteName = (int)item, ByteCount = (int)sout[item] });
+            }
+            willre.Sort(SortCompare);
+            return willre;
+
+        }
+
+        private static int SortCompare(object a, object b)//进行排序时作为参数使用
+        {
+            long ac = 0, bc = 0;
+            if (a is ByteFrequency)
+            {
+                ac = (a as ByteFrequency).ByteCount;
+            }
+            else if (a is HuffumanTree)
+            {
+                ac = (a as HuffumanTree).Point;
+            }
+            else
+            {
+                return 0;
+            }
+
+            if (b is ByteFrequency)
+            {
+                bc = (b as ByteFrequency).ByteCount;
+            }
+            else if (b is HuffumanTree)
+            {
+                bc = (b as HuffumanTree).Point;
+            }
+            else
+            {
+                return 0;
+            }
+
+
+
+            if (ac < bc)
+            {
+                return -1;
+            }
+            else return 0;
+        }
+    }
+
+    class ByteFrequency//字節類
+    {
+        public int ByteName { get; set; }
+        public long ByteCount { get; set; }//頻率，作為權值
+    }
+
+    class HuffumanTree//樹
+    {
+        public int Value { get; set; }
+        public long Point { get; set; }//權值
+
+        public object Left { get; set; }
+        public object Right { get; set; }
+
+        public string HuffumanCode { get; set; }
+        public int Depth { get; set; }
+    }
+
+    class Head //文件頭結構
+    {
+        private byte[] SouceSize;//源文件的大小 5字節
+        private byte[] LeafCount;//哈夫曼樹的葉子數量-1。  1字節
+
+        //下面是葉子結點的哈夫曼對應表
+        private byte[] HuffumanBitCount;//哈夫曼碼的位數 1字節
+        private byte[] HuffumanCode;//哈夫曼碼 根據位數決定字節，不足補0
+        private byte[] TheNameOfHuffumanCode;//哈夫曼碼對應的字節名 1字節
+    }
+}
