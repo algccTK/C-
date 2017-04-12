@@ -1,1 +1,529 @@
-11
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+
+using System.Threading.Tasks;//Task類
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+
+namespace Toolc
+{
+    // 程序只運行一次
+    static class RunOne
+    {
+        private static bool flag = false;
+        private static System.Threading.Mutex mutex = new System.Threading.Mutex(true, "azzaqsqsqas55", out flag);
+        public static bool IsAlreadyRun()//返回true为此程序已经有在运行，返回false则为此程序没有在运行
+        {
+            return !flag;
+        }
+    }
+
+
+    // 讀寫文件指定字節
+    public class ReadByteToFile
+    {
+        public void doz()
+
+        {
+            System.IO.FileStream readFs = new System.IO.FileStream(@"D:\software\123.iso", System.IO.FileMode.Open);
+            readFs.Position = 6000000000;
+            byte[] Data = new byte[309963];
+            readFs.Read(Data, 0, 309963);
+
+
+
+            System.IO.FileStream writeFs = new System.IO.FileStream(@"D:\test2\filenew", System.IO.FileMode.Create);
+            //writeFs.Position = 200;
+            writeFs.Write(Data, 0, 309963);
+            writeFs.Close();
+        }
+
+    }
+
+
+    // 取數據庫中的部件名稱s
+    class GetdataFromSql//取數據庫中的部件名稱s
+    {
+        private List<string> datas = new List<string>();
+        public IEnumerable<string> getdatas()
+        {
+            foreach (String i in datas) yield return i;
+
+        }
+        public GetdataFromSql()
+        {
+            SqlConnection con = new SqlConnection();
+            con.ConnectionString = "server=192.168.7.12;database=databaseName;user=userName;pwd=password";
+            con.Open();//打开数据库  
+            SqlCommand com = new SqlCommand();
+            com.Connection = con;
+            com.CommandType = CommandType.Text;
+
+            com.CommandText = "select something from aa_test03";
+            SqlDataReader reader = com.ExecuteReader();
+
+            while (reader.Read())
+            {
+                datas.Add(reader[0].ToString());
+            }
+
+            con.Close();//关闭数据库
+        }
+
+    }
+
+
+    //Hhibernate_SQL
+    class Hhibernate_SQL
+    {/*
+        using (ISession session = _sessionFactory.OpenSession())
+            {
+
+                //查
+                //
+                //var a = session.CreateQuery("select aaa.clo1 from aa_test01 aaa").List<string>();
+                //var a = session.CreateQuery("select aaa from aa_test01 aaa where aaa.pk1='2'").List<aa_test01>();
+                
+                //增
+                //
+               /*
+                aa_test02ID a211 = new aa_test02ID() { pk1 = 11, pk2 = 1 };
+                aa_test02ID a212 = new aa_test02ID() { pk1 = 11, pk2 = 2 };
+
+                aa_test02 a21 = new aa_test02();
+                a21.ID=a211;
+                
+                aa_test02 a22 = new aa_test02();
+                a21.ID=a212;
+                
+
+                IList<aa_test02> aa_test02s = new List<aa_test02>();
+                aa_test02s.Add(a21);
+                aa_test02s.Add(a22);
+
+
+                aa_test01 one_test = new aa_test01();
+                one_test.pk1 = 10;
+                one_test.clo14 = DateTime.Parse("2016-09-04");
+                one_test.aa_test02 = aa_test02s;
+
+
+
+
+                session.Save(one_test);//向数据库添加数据
+        
+
+                /*
+                //改
+                //
+                aa_test01 p = session.Get<aa_test01>(1);
+                p.clo1 = p.clo1 + "改2";
+                session.Update(p);
+                */
+
+
+        /*
+        //刪
+        //
+        aa_test01 p1 = session.Get<aa_test01>(3);
+        session.Delete(p1);*/
+        /*
+                session.Flush();
+                session.Close();
+                textBox1.Text = "操作結束";
+                textBox1.Update();
+            }*/
+    }
+
+
+    //MultiCore_Task
+    class MultiCore_Task
+    {
+        static void wwwwe(string[] args)
+        {
+            //Programzz.aaa();//MAX
+            //Programzzz.aaaaa();//MAX_MultiCore
+            //Task t1 = new Task(ww); 這種创建方法無法利用多核
+            Task t1 = Task.Factory.StartNew(delegate { ww(); });
+            Task t2 = Task.Factory.StartNew(delegate { ww(); });
+            Task.WaitAll(t1, t2);
+        }
+
+        static void ww()
+        {
+            while (true) ;
+        }
+    }
+
+
+    //ReadTXT
+    class ReadTXT
+    {
+        public void readtxt()
+        {
+
+            string txtpath = @"d:\path.txt", line;
+            StreamReader sr = new StreamReader(txtpath, Encoding.UTF8);//編碼可不用，會自動識別
+
+            while ((line = sr.ReadLine()) != null)//逐行讀取
+            {
+
+            }
+        }
+
+    }
+
+
+    //Txt_Write
+    class Txt_Write
+    {
+        public void Write(string path)
+        {
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(path, true);
+            //开始写入
+            sw.WriteLine(DateTime.Now);
+            //清空缓冲区
+            sw.Flush();
+            //关闭流
+            sw.Close();
+        }
+    }
+
+
+    //Use_resx
+    class Use_resx
+    {
+        //using System.Resources;需引用此命名空間
+        //ResourceManager rm = new ResourceManager(typeof(Form1));
+        //string aa = rm.GetString("boom");//"boom"是資源名
+    }
+
+    //進制轉換
+    class HexadecimalConversion
+    {
+        public static string DecToBinString(int number)//十進制轉二進制
+        {
+            string temp = "";
+            while (number > 1)
+            {
+                temp += (number % 2).ToString();
+                number = number / 2;
+            }
+            temp += (number % 2).ToString();
+
+            string bin = "";
+            for (int i = temp.Length - 1; i > -1; i--)
+            {
+                bin += temp[i].ToString();
+            }
+            return bin;
+        }
+
+        public static string DecToBinString(long number)//十進制轉二進制
+        {
+            string temp = "";
+            while (number > 1)
+            {
+                temp += (number % 2).ToString();
+                number = number / 2;
+            }
+            temp += (number % 2).ToString();
+            string bin = "";
+            for (int i = temp.Length - 1; i > -1; i--)
+            {
+                bin += temp[i].ToString();
+            }
+            return bin;
+        }
+
+        public static string SupplementZero(int needBitCount, string binstr)//補0
+        {
+            if (binstr.Length > needBitCount)
+            {
+                throw new Exception("binstrLength big then BitCount");
+            }
+            string zerostr = "";
+            for (int i = 0; i < (needBitCount - binstr.Length); i++)
+            {
+                zerostr += "0";
+            }
+            return zerostr + binstr;
+        }
+
+        public static byte ByteStrToByte(string byteStr)//1字節的string的二進制轉成字節
+        {
+            double byteNumber = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                byteNumber += double.Parse(byteStr[i].ToString()) * Math.Pow(2, 8 - (i + 1));
+            }
+
+            return byte.Parse(byteNumber.ToString());
+        }
+
+        public static long ByteStrToLong(string byteStr)//字節的string的二進制轉成long類型
+        {
+            double byteNumber = 0;
+            for (int i = 0; i < byteStr.Length; i++)
+            {
+                byteNumber += double.Parse(byteStr[i].ToString()) * Math.Pow(2, byteStr.Length - i - 1);
+            }
+
+            return long.Parse(byteNumber.ToString());
+        }
+
+        public static byte IntToByte(int value)//合法int（0-255）轉字節
+        {
+
+            var byteStr = DecToBinString(value);
+            byteStr = SupplementZero(8, byteStr);
+            return ByteStrToByte(byteStr);
+        }
+    }
+
+
+    //下面方法是c#的深拷贝，纯反射实现，无需实现任何接口，哦对，需要实体类有个无参的构造方法，简单使用强大，微软大法好啊......有需要用到的同学就拿去用吧，目前经过一个几百W的项目框架中考验，真的强大实用
+    //http://www.cnblogs.com/WarBlog/p/5646075.html
+    //測試發現有BUG的
+    class DeepCopy    //深拷貝
+
+    {
+        /// <summary>
+        /// 对象拷贝
+        /// </summary>
+        /// <param name="obj">被复制对象</param>
+        /// <returns>新对象</returns>
+        private object CopyOjbect(object obj)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+            Object targetDeepCopyObj;
+            Type targetType = obj.GetType();
+            //值类型  
+            if (targetType.IsValueType == true)
+            {
+                targetDeepCopyObj = obj;
+            }
+            //引用类型   
+            else
+            {
+                targetDeepCopyObj = System.Activator.CreateInstance(targetType);   //创建引用对象   
+                System.Reflection.MemberInfo[] memberCollection = obj.GetType().GetMembers();
+
+                foreach (System.Reflection.MemberInfo member in memberCollection)
+                {
+                    //拷贝字段
+                    if (member.MemberType == System.Reflection.MemberTypes.Field)
+                    {
+                        System.Reflection.FieldInfo field = (System.Reflection.FieldInfo)member;
+                        Object fieldValue = field.GetValue(obj);
+                        if (fieldValue is ICloneable)
+                        {
+                            field.SetValue(targetDeepCopyObj, (fieldValue as ICloneable).Clone());
+                        }
+                        else
+                        {
+                            field.SetValue(targetDeepCopyObj, CopyOjbect(fieldValue));
+                        }
+
+                    }//拷贝属性
+                    else if (member.MemberType == System.Reflection.MemberTypes.Property)
+                    {
+                        System.Reflection.PropertyInfo myProperty = (System.Reflection.PropertyInfo)member;
+
+                        MethodInfo info = myProperty.GetSetMethod(false);
+                        if (info != null)
+                        {
+                            try
+                            {
+                                object propertyValue = myProperty.GetValue(obj, null);
+                                if (propertyValue is ICloneable)
+                                {
+                                    myProperty.SetValue(targetDeepCopyObj, (propertyValue as ICloneable).Clone(), null);
+                                }
+                                else
+                                {
+                                    myProperty.SetValue(targetDeepCopyObj, CopyOjbect(propertyValue), null);
+                                }
+                            }
+                            catch (System.Exception ex)
+                            {
+
+                            }
+                        }
+                    }
+                }
+            }
+            return targetDeepCopyObj;
+        }
+
+        public static T DeepClone<T>(T obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, obj);
+                ms.Position = 0;
+
+                return (T)formatter.Deserialize(ms);
+            }
+        }
+    }
+
+
+    //http://www.cnblogs.com/yuilin/archive/2011/10/28/2227881.html
+    class DeepCopy2
+    {
+        //利用二进制序列化和反序列化实现
+        //有BUG
+        public static T DeepCopy<T>(T obj)
+        {
+            object retval;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                //序列化成流
+                bf.Serialize(ms, obj);
+                ms.Seek(0, SeekOrigin.Begin);
+                //反序列化成对象
+                retval = bf.Deserialize(ms);
+                ms.Close();
+            }
+            return (T)retval;
+        }
+
+        //利用反射实现
+        public static T DeepCopy3<T>(T obj)
+        {
+            //如果是字符串或值类型则直接返回
+            if (obj is string || obj.GetType().IsValueType) return obj;
+
+            object retval = Activator.CreateInstance(obj.GetType());
+            FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            foreach (FieldInfo field in fields)
+            {
+                try { field.SetValue(retval, DeepCopy(field.GetValue(obj))); }
+                catch { }
+            }
+            return (T)retval;
+        }
+    }
+
+    //http://blog.csdn.net/cangkukuaimanle/article/details/7711375
+    class DeepCopy3
+    {
+        public static object Copy( object obj)
+        {
+            Object targetDeepCopyObj;
+            Type targetType = obj.GetType();
+            //值类型
+            if (targetType.IsValueType == true)
+            {
+                targetDeepCopyObj = obj;
+            }
+            //引用类型 
+            else
+            {
+                targetDeepCopyObj = System.Activator.CreateInstance(targetType);   //创建引用对象 
+                System.Reflection.MemberInfo[] memberCollection = obj.GetType().GetMembers();
+
+                foreach (System.Reflection.MemberInfo member in memberCollection)
+                {
+                    if (member.MemberType == System.Reflection.MemberTypes.Field)
+                    {
+                        System.Reflection.FieldInfo field = (System.Reflection.FieldInfo)member;
+                        Object fieldValue = field.GetValue(obj);
+                        if (fieldValue is ICloneable)
+                        {
+                            field.SetValue(targetDeepCopyObj, (fieldValue as ICloneable).Clone());
+                        }
+                        else
+                        {
+                            field.SetValue(targetDeepCopyObj, Copy(fieldValue));
+                        }
+
+                    }
+                    else if (member.MemberType == System.Reflection.MemberTypes.Property)
+                    {
+                        System.Reflection.PropertyInfo myProperty = (System.Reflection.PropertyInfo)member;
+                        MethodInfo info = myProperty.GetSetMethod(false);
+                        if (info != null)
+                        {
+                            object propertyValue = myProperty.GetValue(obj, null);
+                            if (propertyValue is ICloneable)
+                            {
+                                myProperty.SetValue(targetDeepCopyObj, (propertyValue as ICloneable).Clone(), null);
+                            }
+                            else if (propertyValue==null)
+                            {
+                                myProperty.SetValue(targetDeepCopyObj, null, null);
+                            }
+                            else
+                            {
+                                myProperty.SetValue(targetDeepCopyObj, Copy(propertyValue), null);
+                            }
+                        }
+
+                    }
+                }
+            }
+            return targetDeepCopyObj;
+        }
+    }
+
+    class WpfHelper
+    {
+        //手寫Steyle
+        public static void StyleCS()
+        {
+            //Style showColorStyle = new Style();
+            //showColorStyle.TargetType = typeof(DataGridCell);
+
+            ////trigger 1
+            //DataTrigger dt = new DataTrigger()
+            //{
+            //    Binding = new System.Windows.Data.Binding() { Converter = new StausConverter123(), ConverterParameter = binding2.Path.Path }
+            //    ,
+            //    Value = "1"
+            //};
+            //System.Drawing.Color co1 = (Color)ColorConverter.ConvertFromString("#F6CECE");
+            //SolidColorBrush co_1 = new SolidColorBrush(co1);
+            //dt.Setters.Add(new Setter(DataGridCell.BackgroundProperty, co_1));
+            //showColorStyle.Triggers.Add(dt);
+
+
+           // datagridProjectTask.Columns.Add(new DataGridTextColumn { Header = c.Name + "(計劃)", Binding = binding2, CellStyle = showColorStyle });
+           // datagridProjectTask.Columns.Add(new DataGridTextColumn { Header = c.Name + "(實際)", Binding = binding });
+
+        }
+
+        //手寫DataTemplate
+        public static void DataTemplateCS()
+        {
+            ////建DataTemplate ,為了居中
+            //FrameworkElementFactory fef = new FrameworkElementFactory(typeof(HyperlinkButton));
+            //fef.SetValue(VerticalAlignmentProperty, VerticalAlignment.Center);
+            //fef.SetValue(VerticalContentAlignmentProperty, VerticalAlignment.Center);
+            //fef.SetValue(ContentProperty, binding2);
+            ////建DataTemplate END
+
+            //datagridProjectTask.Columns.Add(new DataGridTemplateColumn { Header = c.Name + "(計劃)", CellStyle = changeColorStyle, CellTemplate = new DataTemplate() { VisualTree = fef } });  //可居中，有下劃線
+            ////datagridProjectTask.Columns.Add(new DataGridTextColumn { Header = c.Name + "(計劃)", Binding = binding2  , CellStyle = changeColorStyle});  //僅計劃完成日期變色，變色列無法居中
+            //datagridProjectTask.Columns.Add(new DataGridTextColumn { Header = c.Name + "(實際)", Binding = binding });
+
+        }
+    }
+
+}
+
