@@ -37,5 +37,11 @@ namespace C102_RandomPassword
             Clipboard.SetDataObject(textBox.Text);
 
         }
+
+        private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            textBox.Text = RandomPassword.GetSuperSpecialPassword();
+            Clipboard.SetDataObject(textBox.Text);
+        }
     }
 }
