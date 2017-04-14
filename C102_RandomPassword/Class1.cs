@@ -37,6 +37,35 @@ namespace C102_RandomPassword
             return password;
         }
 
+
+        public static string GetSuperSpecialPassword()    //返回中文
+        {
+            string password = string.Empty;
+            var length = r.Next(15, 21);
+            for (int i = 0; i < length; i++)
+            {
+                var index = r.Next(19968, 40895);   ////http://blog.csdn.net/m372897500/article/details/37592543
+                string x = ((char)index).ToString();
+                password += x;
+            }
+            return password;
+        }
+        //public static string GetSuperSpecialPassword()
+        //{
+        //    string password = string.Empty;
+        //    var length = r.Next(15, 21);
+        //    for (int i = 0; i < length; i++)
+        //    {
+        //        var x = Encoding.Unicode.GetString(new Byte[] { (Byte)r.Next(0, 256), (Byte)r.Next(0, 256) });
+        //        if (x[0].ToString()==@"\\" || x== "煮" || x== "�")
+        //        {
+        //            continue;
+        //        }
+        //        password += x;
+        //    }
+        //    return password;
+        //}
+
         private static string GetRandomNumber()
         {
             return r.Next(0, 10).ToString();
