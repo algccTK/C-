@@ -6,31 +6,44 @@
         xmlns:local="clr-namespace:C102_RandomPassword"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="137.783"
-        Width="190.837">
+        Height="114.667"
+        Width="282.454">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="83*" />
+        </Grid.RowDefinitions>
         <TextBox x:Name="textBox"
-                 HorizontalAlignment="Left"
-                 Height="23"
                  TextWrapping="Wrap"
-                 
-                 VerticalAlignment="Top"
-                 Width="163"
-                 Margin="10,53,0,0" />
+                 Width="252"
+                 MinWidth="180"
+                 HorizontalAlignment="Right"
+                 Grid.Row="1"
+                 Margin="5,5,5,5" />
         <Button x:Name="button"
                 Content="General"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Width="75"
                 Margin="10,10,0,0"
-                Click="button_Click" />
+                Click="button_Click"
+                Height="22" />
         <Button x:Name="button1"
                 Content="Special"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Width="75"
-                Margin="98,10,0,0"
-                Click="button1_Click" />
+                Margin="90,10,0,0"
+                Click="button1_Click"
+                Height="22" />
+        <Button x:Name="button2"
+                Content="SuperSpecial"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Width="92"
+                Margin="170,10,0,0"
+                Click="button2_Click"
+                Height="22" />
 
     </Grid>
 </Window>
