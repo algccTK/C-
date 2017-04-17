@@ -10,15 +10,15 @@ namespace _004_WPF_Practice2
 {
     class Rename
     {
-        public Rename(List<string> mkvlist, List<string> asslist, string path)
+        public static void DoRename(List<string> mkvlist, List<string> asslist, string path)
         {
             
             foreach (string item in asslist)
             {
-                string re = "^.*[^0-9A-Za-z](\\d{2})[^0-9A-Za-z].*\\.(\\w*)$";
+                string re = "^.*[^0-9](\\d{2})[^0-9]?.*\\.(\\w*)$";
                 var aa = Regex.Match(item, re);
                 string willRename="";
-                string re2 = string.Format("(^.*[^0-9A-Za-z]{0}[^0-9A-Za-z].*)\\.\\w*$", aa.Groups[1].ToString());
+                string re2 = string.Format("(^.*[^0-9]{0}[^0-9]?.*)\\.\\w*$", aa.Groups[1].ToString());
                 foreach (var mkvitem in mkvlist)
                 {
                     if (Regex.IsMatch(mkvitem, re2))
@@ -32,6 +32,9 @@ namespace _004_WPF_Practice2
                 string destFileName = path + "\\" + willRename;
                 File.Move(sourceFileName, destFileName);
             }
+
+
+
         }
     }
 }
