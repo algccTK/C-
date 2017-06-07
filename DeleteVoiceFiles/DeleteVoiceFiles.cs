@@ -42,7 +42,7 @@ namespace test_ConsoleApplication
 
             foreach (FileInfo item in TheFolder.GetFiles())//遍歷當前目錄下的文件
             {
-                if (item.Extension == ".ogg" || item.Extension == ".wav")
+                if (item.Extension == ".ogg" || item.Extension == ".wav" || IsCustomExtension(item.Extension))
                 {
                     Console.WriteLine("准备删除:" + item.FullName);
                     File.Delete(item.FullName);
@@ -63,7 +63,7 @@ namespace test_ConsoleApplication
             }
         }
 
-        private static bool IsCustomExtension(string fileExtension)
+        private static bool IsCustomExtension(string fileExtension)//判断是否与作为参数传入的相同
         {
             if (Gobal.CustomExtension == null || Gobal.CustomExtension.Length == 0) return false;
             foreach (var item in Gobal.CustomExtension)
