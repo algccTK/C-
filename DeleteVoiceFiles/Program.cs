@@ -11,6 +11,7 @@ namespace test_ConsoleApplication
     {
         public static void Main(string[] args)
         {
+            Gobal.CustomExtension=args;
             DeleteVoiceFiles.Strat();
 
         }
